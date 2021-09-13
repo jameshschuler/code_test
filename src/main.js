@@ -1,12 +1,11 @@
 const fs = require( "fs" );
 
-function loadData () {
+function loadData ( path ) {
     try {
-        const path = process.argv[ 2 ] || 'sample_input.txt';
         const data = fs.readFileSync( path, 'utf8' );
 
         if ( !data || data.length === 0 ) {
-            console.log( 'Invalid data, unable to process.' );
+            console.error( 'Invalid data, unable to process.' );
             return;
         }
 
@@ -17,34 +16,33 @@ function loadData () {
 }
 
 function printData ( people ) {
+    let summary = '';
     people.forEach( ( { city, state, name, age, isFemale, isEmployee, isStudent } ) => {
         let sex = isFemale ? 'Female' : 'Male';
         let displayedAge = age ? `${age}, ` : '';
 
-        console.log( `${name} [${displayedAge}${sex}]` );
-        console.log( `\tCity : ${city}` );
-        console.log( `\tState : ${state}` );
-        console.log( `\tStudent : ${isStudent ? 'Yes' : 'No'}` );
-        console.log( `\tEmployee : ${isEmployee ? 'Yes' : 'No'}` );
-        console.log( '\n' )
+        summary += `${name} [${displayedAge}${sex}]`;
+        summary += `\n\tCity : ${city}`;
+        summary += `\n\tState : ${state}`;
+        summary += `\n\tStudent : ${isStudent ? 'Yes' : 'No'}`;
+        summary += `\n\tEmployee : ${isEmployee ? 'Yes' : 'No'}`;
+        summary += '\n\n';
     } );
+
+    console.log( summary );
+    return summary;
 }
 
-function processData () {
-    let data = loadData();
-    let parsed = data.split( /\r?\n/ );
+function processData ( data ) {
+    if ( !data ) {
+        return 'Invalid data, unable to process.';
+    }
 
     let people = [];
     let currentPerson = {};
 
-    for ( let i = 0; i < parsed.length; i++ ) {
-        let field = parsed[ i ];
-
-        if ( field === '' || i + 1 === parsed.length ) {
-            people.push( currentPerson );
-            currentPerson = {};
-            continue;
-        }
+    for ( let i = 0; i < data.length; i++ ) {
+        let field = data[ i ];
 
         if ( field.includes( '(Name)' ) ) {
             currentPerson.name = field.split( '(Name)' )[ 1 ];
@@ -66,13 +64,28 @@ function processData () {
                 currentPerson.isEmployee = currentPerson.flags[ 2 ] === 'Y';
             }
         }
+
+        if ( field === '' || i + 1 === data.length ) {
+            people.push( currentPerson );
+            currentPerson = {};
+            continue;
+        }
     }
 
-    let filtered = people.filter( value => Object.keys( value ).length !== 0 );
-
-    printData( filtered );
+    return people.filter( value => Object.keys( value ).length !== 0 );
 }
 
 try {
-    processData();
+    const path = process.argv[ 2 ] || 'sample_input.txt';
+    const data = loadData( path );
+
+    const results = processData( data.split( /\r?\n/ ) );
+    printData( results );
 } catch ( err ) { }
+
+
+module.exports = {
+    loadData,
+    processData,
+    printData
+}

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node ./src/main.js"
+    "dev": "node ./src/main.js",
+    "test": "mocha ./src/**/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/jameshschuler/code_test/issues"
   },
-  "homepage": "https://github.com/jameshschuler/code_test#readme"
+  "homepage": "https://github.com/jameshschuler/code_test#readme",
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^9.1.1"
+  }
 }
